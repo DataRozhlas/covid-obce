@@ -8,7 +8,7 @@ const MunicipalitiesTable = () => {
 
   React.useEffect(() => {
     fetch('https://data.irozhlas.cz/covid-uzis/obce.json').then(response => {
-      response.json().then(payload => {
+      response.json().then(payload => {        
         setDistricts(prepareDistrictsData(payload))
       })
     })
@@ -135,6 +135,7 @@ const MunicipalitiesTable = () => {
                 )}
               </button>
             </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -156,6 +157,7 @@ const MunicipalitiesTable = () => {
                   <td class="align-right">{district.totalCasesPer100000}</td>
                   <td class="align-right">{district.last7DaysCases}</td>
                   <td class="align-right">{district.last7DaysCasesPer100000}</td>
+                  <td><HeatStrip levelsPerWeek={district.levelsPerWeek} /></td>
                 </tr>
 
                 {(openDistricts.includes(district.name) || usingSearchQuery) && (
@@ -168,6 +170,7 @@ const MunicipalitiesTable = () => {
                         <td class="align-right">{municipality.totalCasesPer100000}</td>
                         <td class="align-right">{municipality.last7DaysCases}</td>
                         <td class="align-right">{municipality.last7DaysCasesPer100000}</td>
+                        <td><HeatStrip levelsPerWeek={municipality.levelsPerWeek} /></td>
                       </tr>
                     ))}
                   </>
@@ -177,7 +180,7 @@ const MunicipalitiesTable = () => {
           })}
           {!usingSearchQuery && (
             <tr>
-              <td colSpan={6}>
+              <td colSpan={7}>
                 <button type="button" onClick={() => setShowAll(!showAll)}>
                   {showAll ? 'Zobrazit méně' : 'Zobrazit vše'}
                 </button>
@@ -186,7 +189,7 @@ const MunicipalitiesTable = () => {
           )}
           {districtsAfterSortAndSearch.length === 0 && (
             <tr>
-              <td colSpan={6}>Obec s hledaným názvem jsme nenašli</td>
+              <td colSpan={7}>Obec s hledaným názvem jsme nenašli</td>
             </tr>
           )}
         </tbody>
@@ -195,10 +198,20 @@ const MunicipalitiesTable = () => {
   )
 }
 
+const HeatStrip = ({ levelsPerWeek }) => {
+  return (
+    <div class="heat-strip">
+      {levelsPerWeek.map((level, index) => (
+        <div key={index} class={`heat-strip-item heat-strip-level-${level}`} />
+      ))}
+    </div>
+  )
+}
+
 const prepareDistrictsData = (payload) => {
   let districts = {}
 
-  payload.forEach((payloadRow, index) => {      
+  payload.forEach(payloadRow => {      
     const districtName = payloadRow[0]
     const authorityRegionName = payloadRow[1]
     let municipalityName = payloadRow[2]
@@ -240,14 +253,61 @@ const prepareDistrictsData = (payload) => {
     })
   })
 
+  // let maxCasesPer100000 = 0
+  // Object.values(districts).forEach(district => {
+  //   maxCasesPer100000 = Math.max(maxCasesPer100000, getMaxCasesInWeekPer100000(district))
+
+  //   district.municipalities.forEach(municipality => {
+  //     maxCasesPer100000 = Math.max(maxCasesPer100000, getMaxCasesInWeekPer100000(municipality))
+  //   })
+  // })
+
+  // let allCasesPerWeekValues = []
+  // Object.values(districts).forEach(district => {
+  //   const casesPer100000PerWeek = district.casesPerWeek.map(cases => district.population > 0 ? Math.round((cases / district.population) * 100000) : 0)
+  //   allCasesPerWeekValues = allCasesPerWeekValues.concat(casesPer100000PerWeek.filter(casesPer100000 => casesPer100000 > 0))
+
+  //   district.municipalities.forEach(municipality => {
+  //     const casesPer100000PerWeek = municipality.casesPerWeek.map(cases => municipality.population > 0 ? Math.round((cases / municipality.population) * 100000) : 0)
+  //     allCasesPerWeekValues = allCasesPerWeekValues.concat(casesPer100000PerWeek.filter(casesPer100000 => casesPer100000 > 0))
+  //   })
+  // })
+
+  // allCasesPerWeekValues = allCasesPerWeekValues.sort((a, b) => a - b)
+
+  // console.log('-------', {
+  //   p25: computeQuantile(allCasesPerWeekValues, .25),
+  //   median: computeQuantile(allCasesPerWeekValues, .5),
+  //   p75: computeQuantile(allCasesPerWeekValues, .75)
+  // })
+
+  // const casesLevelsThresholds = {
+  //   2: computeQuantile(allCasesPerWeekValues, .25),
+  //   3: computeQuantile(allCasesPerWeekValues, .5),
+  //   4: computeQuantile(allCasesPerWeekValues, .75)
+  // }
+
+  // It would be great to compute these percentiles, but that takes way too long,
+  // so we just hardcode them here for now
+  const casesLevelsThresholds = {
+    2: 76,
+    3: 216,
+    4: 474
+  }
+
+  // console.log('-------', {
+  //   maxCasesPer100000,
+  //   casesLevelsThresholds
+  // })
+
   districts = Object.values(districts).map(district => {      
     return {
       ...district,
-      ...computeStats(district),
+      ...computeStats(district, casesLevelsThresholds),
       municipalities: district.municipalities.map(municipality => {      
         return {
           ...municipality,
-          ...computeStats(municipality)
+          ...computeStats(municipality, casesLevelsThresholds)
         }
       })
     }
@@ -256,7 +316,7 @@ const prepareDistrictsData = (payload) => {
   return districts
 }
 
-const computeStats = (municipalityOrDistrict) => {
+const computeStats = (municipalityOrDistrict, casesLevelsThresholds) => {
   const {
     population,
     casesPerWeek,
@@ -264,6 +324,7 @@ const computeStats = (municipalityOrDistrict) => {
   } = municipalityOrDistrict
 
   const totalCases = casesPerWeek.reduce((carry, cases) => carry + cases, 0)
+  const casesPer100000PerWeek = casesPerWeek.map(cases => population > 0 ? Math.round((cases / population) * 100000) : 0)
 
   let totalCasesPer100000 = 0
   let last7DaysCasesPer100000 = 0
@@ -275,14 +336,52 @@ const computeStats = (municipalityOrDistrict) => {
     totalCasesPer100000 = Math.round((totalCases / population) * 100000)
     last7DaysCasesPer100000 = Math.round((last7DaysCases / population) * 100000)
   }
+
+  const levelsPerWeek = casesPer100000PerWeek.map(casesPer100000 => {
+    if (casesPer100000 === 0) {
+      return 0
+    }
+
+    for (const level of [4, 3, 2]) {
+      if (casesPer100000 >= casesLevelsThresholds[level]) {
+        return level
+      }
+    }
+
+    return 1
+  })
   
   return {
     totalCases,
     totalCasesPer100000,
     last7DaysCases,
-    last7DaysCasesPer100000
+    last7DaysCasesPer100000,
+    levelsPerWeek
   }
 }
+
+const getMaxCasesInWeekPer100000 = (municipalityOrDistrict) => {
+  const {
+    casesPerWeek,
+    population
+  } = municipalityOrDistrict
+
+  const casesPer100000PerWeek = casesPerWeek.map(cases => population > 0 ? Math.round((cases / population) * 100000) : 0)
+
+  return Math.max(...casesPer100000PerWeek)
+}
+
+const computeQuantile = (arr, q) => {
+  const sorted = arr;
+  const pos = (sorted.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (sorted[base + 1] !== undefined) {
+      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+  } else {
+      return sorted[base];
+  }
+};
 
 const container = document.getElementById("datarozhlas-covid-obce-tabulka");
 if (container) {

@@ -5,3 +5,35 @@
 #datarozhlas-covid-obce-tabulka table tbody td.align-right {
   text-align: right;
 }
+
+
+#datarozhlas-covid-obce-tabulka .heat-strip {
+  display: flex;
+  flex-direction: row;
+  margin-left: 20px;
+}
+
+#datarozhlas-covid-obce-tabulka .heat-strip-item {
+  width: 4px;
+  height: 12px;
+}
+
+#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-0 {
+  background: #F2F2F2;
+}
+
+#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-1 {
+  background: #F2DF91;
+}
+
+#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-2 {
+  background: #FFAE43;
+}
+
+#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-3 {
+  background: #FF6E0B;
+}
+
+#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-4 {
+  background: #CE0A05;
+}
