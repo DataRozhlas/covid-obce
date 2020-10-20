@@ -146,6 +146,7 @@ const MunicipalitiesTable = () => {
                     <button
                       type="button"
                       onClick={() => toggleDistrict(district.name)}
+                      disabled={usingSearchQuery}
                     >
                       {openDistricts.includes(district.name) ? '-' : '+'}
                     </button>
