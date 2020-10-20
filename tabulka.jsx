@@ -197,26 +197,20 @@ const MunicipalitiesTable = () => {
 const prepareDistrictsData = (payload) => {
   let districts = {}
 
-  payload.forEach((municipality, index) => {      
-    const districtName = municipality[0]
-    const municipalityName = municipality[1]
-    const population = municipality[2]
-    const casesPerWeek = municipality.slice(3)
+  payload.forEach((payloadRow, index) => {      
+    const districtName = payloadRow[0]
+    const authorityRegionName = payloadRow[1]
+    let municipalityName = payloadRow[2]
+    const population = payloadRow[3]
+    const casesPerWeek = payloadRow.slice(4, -1)
+    const last7DaysCases = payloadRow[payloadRow.length - 1]
 
-    if (!districtName || !municipalityName || !population) {
-      // TODO: remove when the source data are fixed
-      console.log('Temporarily throwing away municipality', {
-        municipality, index
-      })
-      return
-    }
-
-    if (municipalityName === 'Březina (Brno-venkov)' || municipalityName === 'Mezholezy (Domažlice)') {
-      // TODO: remove when the source data are fixed
-      console.log('Temporarily throwing away municipality', {
-        municipality, index
-      })
-      return
+    // These two are twice in their respective districts and we need to differentiate them
+    if (
+      (municipalityName === 'Březina' && districtName === 'Brno-venkov')
+      || (municipalityName === 'Mezholezy' && districtName === 'Domažlice')
+    ) {
+      municipalityName += ` (${authorityRegionName})`
     }
 
     if (!districts[districtName]) {
@@ -226,6 +220,7 @@ const prepareDistrictsData = (payload) => {
         searchNameUnaccented: deburr(districtName).toLowerCase(),
         population: 0,
         casesPerWeek: casesPerWeek.map(() => 0),
+        last7DaysCases: 0,
         municipalities: []
       }
     }
@@ -233,12 +228,14 @@ const prepareDistrictsData = (payload) => {
     districts[districtName].casesPerWeek = districts[districtName].casesPerWeek.map((cases, index) => {
       return cases + casesPerWeek[index]
     })
+    districts[districtName].last7DaysCases += last7DaysCases
     districts[districtName].municipalities.push({
       name: municipalityName,
       searchName: municipalityName.toLowerCase(),
       searchNameUnaccented: deburr(municipalityName).toLowerCase(),
       population,
-      casesPerWeek
+      casesPerWeek,
+      last7DaysCases
     })
   })
 
@@ -260,12 +257,12 @@ const prepareDistrictsData = (payload) => {
 
 const computeStats = (municipalityOrDistrict) => {
   const {
+    population,
     casesPerWeek,
-    population
+    last7DaysCases
   } = municipalityOrDistrict
 
   const totalCases = casesPerWeek.reduce((carry, cases) => carry + cases, 0)
-  const last7DaysCases = casesPerWeek[casesPerWeek.length - 2] // TODO: change to - 1
 
   const totalCasesPer100000 = Math.round((totalCases / population) * 100000)
   const last7DaysCasesPer100000 = Math.round((last7DaysCases / population) * 100000)
