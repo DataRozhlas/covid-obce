@@ -264,9 +264,17 @@ const computeStats = (municipalityOrDistrict) => {
 
   const totalCases = casesPerWeek.reduce((carry, cases) => carry + cases, 0)
 
-  const totalCasesPer100000 = Math.round((totalCases / population) * 100000)
-  const last7DaysCasesPer100000 = Math.round((last7DaysCases / population) * 100000)
+  let totalCasesPer100000 = 0
+  let last7DaysCasesPer100000 = 0
 
+  // Few municipalities have zero population and right now also zero cases, but if they
+  // get any cases, we don't want this computation to fail, so we just leave the per capita
+  // stats zero too
+  if (population > 0) {
+    totalCasesPer100000 = Math.round((totalCases / population) * 100000)
+    last7DaysCasesPer100000 = Math.round((last7DaysCases / population) * 100000)
+  }
+  
   return {
     totalCases,
     totalCasesPer100000,
