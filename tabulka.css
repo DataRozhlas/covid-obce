@@ -1,39 +1,180 @@
-#datarozhlas-covid-obce-tabulka table thead th.align-right {
-  text-align: right;
+.datarozhlas-covid-obce-container {
+  max-width: 620px;
 }
 
-#datarozhlas-covid-obce-tabulka table tbody td.align-right {
-  text-align: right;
+.datarozhlas-covid-obce-headline {
+  font-family: "Noticia Text", serif;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 900;
+  color: #000000;
+  margin: 1.25em 0 .5em;
 }
 
+.datarozhlas-covid-obce-search {
+  font-family: "Noticia Text", serif;
+  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid #D0D0D0;
+  padding: 5px 10px;
+  min-width: 230px;
+  margin: .25em 0 0 0;
+}
 
-#datarozhlas-covid-obce-tabulka .heat-strip {
+.datarozhlas-covid-obce-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: -28px;
+}
+
+.datarozhlas-covid-obce-table thead th {
+  border-bottom: 1px solid #ABABAB;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-align: left;
+  vertical-align: bottom;
+  padding: 9px 5px;
+}
+
+.datarozhlas-covid-obce-table thead th button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-align: right;
+  outline: none;
+  cursor: pointer;
+}
+
+.datarozhlas-covid-obce-table thead th button:hover {
+  text-decoration: underline;
+}
+
+.datarozhlas-covid-obce-table tbody td {
+  border-bottom: 1px solid #D4D4D4;
+  padding: 10px 5px;
+}
+
+.datarozhlas-covid-obce-heat-strip {
   display: flex;
   flex-direction: row;
-  margin-left: 20px;
 }
 
-#datarozhlas-covid-obce-tabulka .heat-strip-item {
-  width: 4px;
-  height: 12px;
+.datarozhlas-covid-obce-heat-strip-item {
+  width: 3px;
+  height: 17px;
+  border-left: 1px solid rgba(255, 255, 255, .25)
 }
 
-#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-0 {
+.datarozhlas-covid-obce-heat-strip-item.heat-strip-level-0 {
   background: #F2F2F2;
 }
 
-#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-1 {
+.datarozhlas-covid-obce-heat-strip-item.heat-strip-level-1 {
   background: #F2DF91;
 }
 
-#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-2 {
+.datarozhlas-covid-obce-heat-strip-item.heat-strip-level-2 {
   background: #FFAE43;
 }
 
-#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-3 {
+.datarozhlas-covid-obce-heat-strip-item.heat-strip-level-3 {
   background: #FF6E0B;
 }
 
-#datarozhlas-covid-obce-tabulka .heat-strip-item.heat-strip-level-4 {
+.datarozhlas-covid-obce-heat-strip-item.heat-strip-level-4 {
   background: #CE0A05;
 }
+
+.datarozhlas-covid-obce-heat-strip-cell {
+  padding-left: 20px !important;
+}
+
+.datarozhlas-covid-obce-num-cell {
+  text-align: right;
+}
+
+.datarozhlas-covid-obce-capita-cell {
+  text-align: right;
+  color: #7A7A7A;
+}
+
+.datarozhlas-covid-obce-show-cell {
+  padding: 0 !important;
+}
+
+.datarozhlas-covid-obce-show-cell button {
+  display: block;
+  width: 100%;
+  background: #F2F2F2;
+  border: none;
+  margin: 0;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+
+  font-family: "Noticia Text", serif;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 900;
+  color: #000000;
+}
+
+.datarozhlas-covid-obce-hs-legend-title {
+  text-align: center;
+  max-width: 136px;
+}
+
+.datarozhlas-covid-obce-hs-legend {
+  display: flex;
+  flex-direction: row;
+  max-width: 136px;
+  margin-top: 5px;
+}
+
+.datarozhlas-covid-obce-hs-legend-1 {
+  width: 25%;
+  height: 8px;
+  background-color: #F2DF91
+}
+
+.datarozhlas-covid-obce-hs-legend-2 {
+  width: 25%;
+  height: 8px;
+  background-color: #FFAE43
+}
+
+.datarozhlas-covid-obce-hs-legend-3 {
+  width: 25%;
+  height: 8px;
+  background-color: #FF6E0B
+}
+
+.datarozhlas-covid-obce-hs-legend-4 {
+  width: 25%;
+  height: 8px;
+  background-color: #CE0A05
+}
+
+.datarozhlas-covid-obce-hs-legend-labels {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  max-width: 136px;
+  margin-top: 3px;
+}
+
+.datarozhlas-covid-obce-hs-legend-cell {
+  padding-left: 20px !important;
+}
+
+
+

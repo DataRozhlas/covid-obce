@@ -1,10 +1,13 @@
 const path = require('path');
 
 module.exports = {
-  entry: './tabulka.jsx',
+  entry: {
+    tabulka: './tabulka.jsx',
+    'tabulka-okresy': './tabulka-okresy.jsx'
+  },
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'tabulka.js',
+    filename: '[name].js',
   },
   module: {
     rules: [

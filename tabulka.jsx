@@ -3,25 +3,18 @@ import ReactDOM from "react-dom";
 import deburr from 'lodash/deburr'
 import orderBy from 'lodash/orderBy'
 
+import { computeStats } from './shared.jsx'
+
 const MunicipalitiesTable = () => {
-  const [districts, setDistricts] = React.useState(null)
+  const [municipalities, setMunicipalities] = React.useState(null)
 
   React.useEffect(() => {
     fetch('https://data.irozhlas.cz/covid-uzis/obce.json').then(response => {
       response.json().then(payload => {        
-        setDistricts(prepareDistrictsData(payload))
+        setMunicipalities(prepareMunicipalitiesData(payload))
       })
     })
-  }, [setDistricts])
-
-  const [openDistricts, setOpenDistricts] = React.useState([])
-  const toggleDistrict = React.useCallback(districtName => {
-    if (openDistricts.includes(districtName)) {
-      setOpenDistricts(openDistricts.filter(i => i !== districtName))
-    } else {
-      setOpenDistricts([...openDistricts, districtName])
-    }
-  }, [openDistricts, setOpenDistricts])
+  }, [setMunicipalities])
 
   const [sort, setSort] = React.useState(['last7DaysCasesPer100000', 'desc'])
   const toggleSort = React.useCallback(propertyToSortBy => {
@@ -34,216 +27,177 @@ const MunicipalitiesTable = () => {
 
   const [searchQuery, setSearchQuery] = React.useState('')
 
-  const districtsAfterSort = React.useMemo(() => {    
-    return orderBy(districts, [sort[0]], [sort[1]]).map(district => {
-      return {
-        ...district,
-        municipalities: orderBy(district.municipalities, [sort[0]], [sort[1]])
-      }
-    })
-  }, [districts, sort])
+  const municipalitiesAfterSort = React.useMemo(() => {    
+    return orderBy(municipalities, [sort[0]], [sort[1]])
+  }, [municipalities, sort])
 
-  const districtsAfterSortAndSearch = React.useMemo(() => {
+  const municipalitiesAfterSortAndSearch = React.useMemo(() => {
     const searchQueryNormalized = searchQuery.toLowerCase().trim()
 
     if (searchQueryNormalized.length < 2) {
-      return districtsAfterSort
+      return municipalitiesAfterSort
     }
 
-    return districtsAfterSort
-      .map(district => {
-        return {
-          ...district,
-          municipalities: district.municipalities
-            .filter(municipality => municipality.searchName.includes(searchQueryNormalized) || municipality.searchNameUnaccented.includes(searchQueryNormalized))
-        }
-      })
-      .filter(district => district.searchName.includes(searchQueryNormalized) || district.searchNameUnaccented.includes(searchQueryNormalized) || district.municipalities.length > 0)
-  }, [districtsAfterSort, searchQuery])
+    return municipalitiesAfterSort
+      .filter(municipality => municipality.searchName.includes(searchQueryNormalized) || municipality.searchNameUnaccented.includes(searchQueryNormalized))
+  }, [municipalitiesAfterSort, searchQuery])
 
   const usingSearchQuery = searchQuery.toLowerCase().trim().length >= 2
 
-  const [showAll, setShowAll] = React.useState(false)
+  const [showCount, setShowCount] = React.useState(15)
 
-  const districtsAfterSortAndSearchAndShowAll = React.useMemo(() => {
-    return (showAll || usingSearchQuery) ? districtsAfterSortAndSearch : districtsAfterSortAndSearch.slice(0, 10)
-  }, [districtsAfterSortAndSearch, showAll, usingSearchQuery])
+  const municipalitiesAfterSortAndSearchAndShowCount = React.useMemo(() => {
+    return municipalitiesAfterSortAndSearch.slice(0, showCount)
+  }, [municipalitiesAfterSortAndSearch, showCount])
 
-  if (!districts) {
+  if (!municipalities) {
     return null
   }
 
-  // console.log('------', {
-  //   districts,
-  //   districtsSorted
-  // })
-
   return (
-    <>
+    <div class="datarozhlas-covid-obce-container">
+      <h3 class="datarozhlas-covid-obce-headline">Detekovaní nakažení po obcích</h3>
+
       <input
+        class="datarozhlas-covid-obce-search"
         type="text"
         value={searchQuery}
         onChange={e => setSearchQuery(e.currentTarget.value)}
-        placeholder="Hledejte obec…"
+        placeholder="Hledejte dle názvu obce…"
       />
-      <table class="municipalities-table">
+
+      <table class="datarozhlas-covid-obce-table">
         <thead>
           <tr>
-            <th></th>
-            <th></th>
-            <th class="align-right">
+            <th>Obce</th>
+            <th>
               <button type="button" onClick={() => toggleSort('totalCases')}>
-                Počet detekovaných
+                Celkem
                 {sort[0] === 'totalCases' && sort[1] === 'asc' && (
-                  <> ↑</>
+                  <>&nbsp;↑</>
                 )}
                 {sort[0] === 'totalCases' && sort[1] === 'desc' && (
-                  <> ↓</>
+                  <>&nbsp;↓</>
                 )}
               </button>
             </th>
-            <th class="align-right">
+            <th>
               <button type="button" onClick={() => toggleSort('totalCasesPer100000')}>
-                Na 100 000
+                Na 100 tisíc
                 {sort[0] === 'totalCasesPer100000' && sort[1] === 'asc' && (
-                  <> ↑</>
+                  <>&nbsp;↑</>
                 )}
                 {sort[0] === 'totalCasesPer100000' && sort[1] === 'desc' && (
-                  <> ↓</>
+                  <>&nbsp;↓</>
                 )}
               </button>
             </th>
-            <th class="align-right">
+            <th>
               <button type="button" onClick={() => toggleSort('last7DaysCases')}>
-                Detekovaných za 7 dní
+                Posl. 7&nbsp;dní
                 {sort[0] === 'last7DaysCases' && sort[1] === 'asc' && (
-                  <> ↑</>
+                  <>&nbsp;↑</>
                 )}
                 {sort[0] === 'last7DaysCases' && sort[1] === 'desc' && (
-                  <> ↓</>
+                  <>&nbsp;↓</>
                 )}
               </button>
             </th>
-            <th class="align-right">
+            <th>
               <button type="button" onClick={() => toggleSort('last7DaysCasesPer100000')}>
-                Na 100 000
+                Na 100 tisíc
                 {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'asc' && (
-                  <> ↑</>
+                  <>&nbsp;↑</>
                 )}
                 {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'desc' && (
-                  <> ↓</>
+                  <>&nbsp;↓</>
                 )}
               </button>
             </th>
-            <th></th>
+            <th class="datarozhlas-covid-obce-hs-legend-cell">
+              <div class="datarozhlas-covid-obce-hs-legend-title">
+                DETEKOVANÍ PO TÝDNECH NA 100 TISÍC
+              </div>
+              <div class="datarozhlas-covid-obce-hs-legend">
+                <div class="datarozhlas-covid-obce-hs-legend-1" />
+                <div class="datarozhlas-covid-obce-hs-legend-2" />
+                <div class="datarozhlas-covid-obce-hs-legend-3" />
+                <div class="datarozhlas-covid-obce-hs-legend-4" />
+              </div>
+              <div class="datarozhlas-covid-obce-hs-legend-labels">
+                <div>MÉNĚ</div>
+                <div>VÍCE</div>
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
-          {districtsAfterSortAndSearchAndShowAll.map(district => {
+          {municipalitiesAfterSortAndSearchAndShowCount.map(municipality => {
             return (
-              <>
-                <tr key={`district-${district.name}`}>
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => toggleDistrict(district.name)}
-                      disabled={usingSearchQuery}
-                    >
-                      {openDistricts.includes(district.name) ? '-' : '+'}
-                    </button>
-                  </td>
-                  <td><strong>{district.name}</strong></td>
-                  <td class="align-right">{district.totalCases}</td>
-                  <td class="align-right">{district.totalCasesPer100000}</td>
-                  <td class="align-right">{district.last7DaysCases}</td>
-                  <td class="align-right">{district.last7DaysCasesPer100000}</td>
-                  <td><HeatStrip levelsPerWeek={district.levelsPerWeek} /></td>
-                </tr>
-
-                {(openDistricts.includes(district.name) || usingSearchQuery) && (
-                  <>
-                    {district.municipalities.map(municipality => (
-                      <tr key={`district-${district.name}-municipality-${municipality.name}`}>
-                        <td></td>
-                        <td>{municipality.name}</td>
-                        <td class="align-right">{municipality.totalCases}</td>
-                        <td class="align-right">{municipality.totalCasesPer100000}</td>
-                        <td class="align-right">{municipality.last7DaysCases}</td>
-                        <td class="align-right">{municipality.last7DaysCasesPer100000}</td>
-                        <td><HeatStrip levelsPerWeek={municipality.levelsPerWeek} /></td>
-                      </tr>
-                    ))}
-                  </>
-                )}
-              </>
+              <tr key={`district-${municipality.name}`}>
+                <td>{municipality.name}</td>
+                <td class="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
+                <td class="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
+                <td class="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
+                <td class="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
+                <td class="datarozhlas-covid-obce-heat-strip-cell">
+                  <HeatStrip levelsPerWeek={municipality.levelsPerWeek} />
+                </td>
+              </tr>
             )
           })}
-          {!usingSearchQuery && (
+          {showCount <= municipalitiesAfterSortAndSearchAndShowCount.length && (
             <tr>
-              <td colSpan={7}>
-                <button type="button" onClick={() => setShowAll(!showAll)}>
-                  {showAll ? 'Zobrazit méně' : 'Zobrazit vše'}
+              <td colSpan={6} class="datarozhlas-covid-obce-show-cell">
+                <button type="button" onClick={() => setShowCount(showCount + 15)}>
+                  Zobrazit více obcí
                 </button>
               </td>
             </tr>
           )}
-          {districtsAfterSortAndSearch.length === 0 && (
+          {municipalitiesAfterSortAndSearchAndShowCount.length === 0 && (
             <tr>
-              <td colSpan={7}>Obec s hledaným názvem jsme nenašli</td>
+              <td colSpan={6}>Obec s hledaným názvem jsme nenašli</td>
             </tr>
           )}
         </tbody>
       </table>
-    </>
+    </div>
   )
 }
 
 const HeatStrip = ({ levelsPerWeek }) => {
   return (
-    <div class="heat-strip">
+    <div class="datarozhlas-covid-obce-heat-strip">
       {levelsPerWeek.map((level, index) => (
-        <div key={index} class={`heat-strip-item heat-strip-level-${level}`} />
+        <div key={index} class={`datarozhlas-covid-obce-heat-strip-item heat-strip-level-${level}`} />
       ))}
     </div>
   )
 }
 
-const prepareDistrictsData = (payload) => {
-  let districts = {}
+const prepareMunicipalitiesData = (payload) => {
+  let municipalities = []
 
   payload.forEach(payloadRow => {      
     const districtName = payloadRow[0]
     const authorityRegionName = payloadRow[1]
     let municipalityName = payloadRow[2]
     const population = payloadRow[3]
-    const casesPerWeek = payloadRow.slice(4, -1)
-    const last7DaysCases = payloadRow[payloadRow.length - 1]
+    const last7DaysCases = payloadRow[4]
+    const casesPerWeek = payloadRow.slice(5, -1)
 
     // These two are twice in their respective districts and we need to differentiate them
     if (
       (municipalityName === 'Březina' && districtName === 'Brno-venkov')
       || (municipalityName === 'Mezholezy' && districtName === 'Domažlice')
     ) {
-      municipalityName += ` (${authorityRegionName})`
+      municipalityName += ` (${authorityRegionName}, ${districtName})`
+    } else {
+      municipalityName += ` (${districtName})`
     }
 
-    if (!districts[districtName]) {
-      districts[districtName] = {
-        name: districtName,
-        searchName: districtName.toLowerCase(),
-        searchNameUnaccented: deburr(districtName).toLowerCase(),
-        population: 0,
-        casesPerWeek: casesPerWeek.map(() => 0),
-        last7DaysCases: 0,
-        municipalities: []
-      }
-    }
-    districts[districtName].population += population
-    districts[districtName].casesPerWeek = districts[districtName].casesPerWeek.map((cases, index) => {
-      return cases + casesPerWeek[index]
-    })
-    districts[districtName].last7DaysCases += last7DaysCases
-    districts[districtName].municipalities.push({
+    municipalities.push({
       name: municipalityName,
       searchName: municipalityName.toLowerCase(),
       searchNameUnaccented: deburr(municipalityName).toLowerCase(),
@@ -253,135 +207,22 @@ const prepareDistrictsData = (payload) => {
     })
   })
 
-  // let maxCasesPer100000 = 0
-  // Object.values(districts).forEach(district => {
-  //   maxCasesPer100000 = Math.max(maxCasesPer100000, getMaxCasesInWeekPer100000(district))
-
-  //   district.municipalities.forEach(municipality => {
-  //     maxCasesPer100000 = Math.max(maxCasesPer100000, getMaxCasesInWeekPer100000(municipality))
-  //   })
-  // })
-
-  // let allCasesPerWeekValues = []
-  // Object.values(districts).forEach(district => {
-  //   const casesPer100000PerWeek = district.casesPerWeek.map(cases => district.population > 0 ? Math.round((cases / district.population) * 100000) : 0)
-  //   allCasesPerWeekValues = allCasesPerWeekValues.concat(casesPer100000PerWeek.filter(casesPer100000 => casesPer100000 > 0))
-
-  //   district.municipalities.forEach(municipality => {
-  //     const casesPer100000PerWeek = municipality.casesPerWeek.map(cases => municipality.population > 0 ? Math.round((cases / municipality.population) * 100000) : 0)
-  //     allCasesPerWeekValues = allCasesPerWeekValues.concat(casesPer100000PerWeek.filter(casesPer100000 => casesPer100000 > 0))
-  //   })
-  // })
-
-  // allCasesPerWeekValues = allCasesPerWeekValues.sort((a, b) => a - b)
-
-  // console.log('-------', {
-  //   p25: computeQuantile(allCasesPerWeekValues, .25),
-  //   median: computeQuantile(allCasesPerWeekValues, .5),
-  //   p75: computeQuantile(allCasesPerWeekValues, .75)
-  // })
-
-  // const casesLevelsThresholds = {
-  //   2: computeQuantile(allCasesPerWeekValues, .25),
-  //   3: computeQuantile(allCasesPerWeekValues, .5),
-  //   4: computeQuantile(allCasesPerWeekValues, .75)
-  // }
-
-  // It would be great to compute these percentiles, but that takes way too long,
-  // so we just hardcode them here for now
+  // TODO
   const casesLevelsThresholds = {
     2: 76,
     3: 216,
     4: 474
   }
 
-  // console.log('-------', {
-  //   maxCasesPer100000,
-  //   casesLevelsThresholds
-  // })
-
-  districts = Object.values(districts).map(district => {      
+  municipalities = municipalities.map(municipality => {      
     return {
-      ...district,
-      ...computeStats(district, casesLevelsThresholds),
-      municipalities: district.municipalities.map(municipality => {      
-        return {
-          ...municipality,
-          ...computeStats(municipality, casesLevelsThresholds)
-        }
-      })
+      ...municipality,
+      ...computeStats(municipality, casesLevelsThresholds)
     }
   })
 
-  return districts
+  return municipalities
 }
-
-const computeStats = (municipalityOrDistrict, casesLevelsThresholds) => {
-  const {
-    population,
-    casesPerWeek,
-    last7DaysCases
-  } = municipalityOrDistrict
-
-  const totalCases = casesPerWeek.reduce((carry, cases) => carry + cases, 0)
-  const casesPer100000PerWeek = casesPerWeek.map(cases => population > 0 ? Math.round((cases / population) * 100000) : 0)
-
-  let totalCasesPer100000 = 0
-  let last7DaysCasesPer100000 = 0
-
-  // Few municipalities have zero population and right now also zero cases, but if they
-  // get any cases, we don't want this computation to fail, so we just leave the per capita
-  // stats zero too
-  if (population > 0) {
-    totalCasesPer100000 = Math.round((totalCases / population) * 100000)
-    last7DaysCasesPer100000 = Math.round((last7DaysCases / population) * 100000)
-  }
-
-  const levelsPerWeek = casesPer100000PerWeek.map(casesPer100000 => {
-    if (casesPer100000 === 0) {
-      return 0
-    }
-
-    for (const level of [4, 3, 2]) {
-      if (casesPer100000 >= casesLevelsThresholds[level]) {
-        return level
-      }
-    }
-
-    return 1
-  })
-  
-  return {
-    totalCases,
-    totalCasesPer100000,
-    last7DaysCases,
-    last7DaysCasesPer100000,
-    levelsPerWeek
-  }
-}
-
-const getMaxCasesInWeekPer100000 = (municipalityOrDistrict) => {
-  const {
-    casesPerWeek,
-    population
-  } = municipalityOrDistrict
-
-  const casesPer100000PerWeek = casesPerWeek.map(cases => population > 0 ? Math.round((cases / population) * 100000) : 0)
-
-  return Math.max(...casesPer100000PerWeek)
-}
-
-const computeQuantile = (arr, q) => {
-  const sorted = arr;
-  const pos = (sorted.length - 1) * q;
-  const base = Math.floor(pos);
-  const rest = pos - base;
-  if (sorted[base + 1] !== undefined) {
-      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
-  } else {
-      return sorted[base];
-  }
-};
 
 const container = document.getElementById("datarozhlas-covid-obce-tabulka");
 if (container) {
