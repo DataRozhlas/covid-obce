@@ -68,7 +68,7 @@ const DistrictsTable = () => {
   const [showAll, setShowAll] = React.useState(false)
 
   const districtsAfterSortAndSearchAndShowAll = React.useMemo(() => {
-    return (showAll || usingSearchQuery) ? districtsAfterSortAndSearch : districtsAfterSortAndSearch.slice(0, 10)
+    return (showAll || usingSearchQuery) ? districtsAfterSortAndSearch : districtsAfterSortAndSearch.slice(0, 15)
   }, [districtsAfterSortAndSearch, showAll, usingSearchQuery])
 
   if (!districts) {
@@ -207,7 +207,7 @@ const DistrictsTable = () => {
             <tr>
               <td colSpan={7} class="datarozhlas-covid-obce-show-cell">
                 <button type="button" onClick={() => setShowAll(!showAll)}>
-                  {showAll ? 'Zobrazit méně' : 'Zobrazit vše'}
+                  {showAll ? 'Zobrazit méně okresů' : 'Zobrazit všechny okresy'}
                 </button>
               </td>
             </tr>
