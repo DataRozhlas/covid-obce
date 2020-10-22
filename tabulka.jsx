@@ -1,11 +1,17 @@
+// polyfills
+import 'core-js/stable'
+import 'whatwg-fetch'
+
 import React from "react";
 import ReactDOM from "react-dom";
 import deburr from 'lodash/deburr'
 import orderBy from 'lodash/orderBy'
 
-import { computeStats, HeatStrip } from './shared.jsx'
+import { computeStats, HeatStrip, useIsMobile } from './shared.jsx'
 
 const MunicipalitiesTable = () => {
+  const [containerRef, isMobile] = useIsMobile()
+
   const [municipalities, setMunicipalities] = React.useState(null)
 
   React.useEffect(() => {
@@ -52,12 +58,18 @@ const MunicipalitiesTable = () => {
     return municipalitiesAfterSortAndSearch.slice(0, showCount)
   }, [municipalitiesAfterSortAndSearch, showCount])
 
+  const [showCols, setShowCols] = React.useState('last7DaysCases')
+  const switchCols = React.useCallback(cols => {
+    setShowCols(cols)
+    setSort([cols + 'Per100000', 'desc'])
+  }, [setShowCols, setSort])
+  
   if (!municipalities) {
     return null
   }
 
   return (
-    <div className="datarozhlas-covid-obce-container">
+    <div className={`datarozhlas-covid-obce-container ${isMobile ? 'datarozhlas-covid-obce-mobile' : ''}`} ref={containerRef}>
       <h3 className="datarozhlas-covid-obce-headline">Detekovaní nakažení po obcích</h3>
 
       <input
@@ -87,54 +99,81 @@ const MunicipalitiesTable = () => {
         </button>
       </div>
 
+      {isMobile && (
+        <div className="datarozhlas-covid-obce-cols-switch">
+          <button
+            className={`datarozhlas-covid-obce-cols-switch-button ${(showCols === 'last7DaysCases') ? 'active' : ''}`}
+            type="button"
+            onClick={() => switchCols('last7DaysCases')}
+          >
+            Posledních 7 dní
+          </button>
+          <button
+            className={`datarozhlas-covid-obce-cols-switch-button ${(showCols === 'totalCases') ? 'active' : ''}`}
+            type="button"
+            onClick={() => switchCols('totalCases')}
+          >
+            Celková čísla
+          </button>
+        </div>
+      )}
+
       <table className="datarozhlas-covid-obce-table">
         <thead>
           <tr>
             <th>Obce</th>
-            <th>
-              <button type="button" onClick={() => toggleSort('totalCases')}>
-                Celkem
-                {sort[0] === 'totalCases' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'totalCases' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
-            <th>
-              <button type="button" onClick={() => toggleSort('totalCasesPer100000')}>
-                Na 100 tisíc
-                {sort[0] === 'totalCasesPer100000' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'totalCasesPer100000' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
-            <th>
-              <button type="button" onClick={() => toggleSort('last7DaysCases')}>
-                Posl. 7&nbsp;dní
-                {sort[0] === 'last7DaysCases' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'last7DaysCases' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
-            <th>
-              <button type="button" onClick={() => toggleSort('last7DaysCasesPer100000')}>
-                Na 100 tisíc
-                {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
+            {(!isMobile || showCols === 'totalCases') && (
+              <>
+                <th>
+                  <button type="button" onClick={() => toggleSort('totalCases')}>
+                    Celkem
+                    {sort[0] === 'totalCases' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'totalCases' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+                <th>
+                  <button type="button" onClick={() => toggleSort('totalCasesPer100000')}>
+                    Na&nbsp;100 tisíc
+                    {sort[0] === 'totalCasesPer100000' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'totalCasesPer100000' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+              </>
+            )}
+            {(!isMobile || showCols === 'last7DaysCases') && (
+              <>
+                <th>
+                  <button type="button" onClick={() => toggleSort('last7DaysCases')}>
+                    Posl. 7&nbsp;dní
+                    {sort[0] === 'last7DaysCases' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'last7DaysCases' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+                <th>
+                  <button type="button" onClick={() => toggleSort('last7DaysCasesPer100000')}>
+                    Na&nbsp;100 tisíc
+                    {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+              </>
+            )}
             <th className="datarozhlas-covid-obce-hs-legend-cell">
               <div className="datarozhlas-covid-obce-hs-legend-title">
                 DETEKOVANÍ PO TÝDNECH NA 100 TISÍC
@@ -157,10 +196,18 @@ const MunicipalitiesTable = () => {
             return (
               <tr key={`district-${municipality.name}`}>
                 <td>{municipality.name}</td>
-                <td className="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
-                <td className="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
-                <td className="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
-                <td className="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
+                {(!isMobile || showCols === 'totalCases') && (
+                  <>
+                    <td className="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
+                    <td className="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
+                  </>
+                )}
+                {(!isMobile || showCols === 'last7DaysCases') && (
+                  <>
+                    <td className="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
+                    <td className="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
+                  </>
+                )}
                 <td className="datarozhlas-covid-obce-heat-strip-cell">
                   <HeatStrip levelsPerWeek={municipality.levelsPerWeek} />
                 </td>
@@ -169,7 +216,7 @@ const MunicipalitiesTable = () => {
           })}
           {showCount <= municipalitiesAfterSortAndSearchAndShowCount.length && (
             <tr>
-              <td colSpan={6} className="datarozhlas-covid-obce-show-cell">
+              <td colSpan={isMobile ? 4 : 6} className="datarozhlas-covid-obce-show-cell">
                 <button type="button" onClick={() => setShowCount(showCount + 15)}>
                   Zobrazit více obcí
                 </button>
@@ -178,11 +225,12 @@ const MunicipalitiesTable = () => {
           )}
           {municipalitiesAfterSortAndSearchAndShowCount.length === 0 && (
             <tr>
-              <td colSpan={6}>Obec s hledaným názvem jsme nenašli</td>
+              <td colSpan={isMobile ? 4 : 6}>Obec s hledaným názvem jsme nenašli</td>
             </tr>
           )}
         </tbody>
       </table>
+      <div className="datarozhlas-covid-obce-source">Zdroj dat: ÚZIS</div>
     </div>
   )
 }

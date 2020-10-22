@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
+import debounce from 'lodash/debounce'
 
 export const computeStats = (municipalityOrDistrict, casesLevelsThresholds) => {
   const {
@@ -52,4 +53,43 @@ export const HeatStrip = ({ levelsPerWeek }) => {
       ))}
     </div>
   )
+}
+
+const useDimensions = () => {
+  const [node, setNode] = React.useState(null)
+  const [dimensions, setDimensions] = React.useState({})
+
+  const ref = React.useCallback(node => {
+    setNode(node)
+  }, [setNode])
+
+  const measure = React.useCallback(debounce(() => {
+    window.requestAnimationFrame(() => {
+      const { width, height } = node.getBoundingClientRect()
+      setDimensions({ width, height })
+    })
+  }, 200), [node, setDimensions])
+  
+  useLayoutEffect(() => {
+    if (node) {
+      measure()
+
+      window.addEventListener("resize", measure);
+      return () => {
+        window.removeEventListener("resize", measure);
+      }
+    }
+  }, [node, measure])
+
+  return [ref, dimensions]
+}
+
+export const useIsMobile = () => {
+  const [containerRef, containerDimensions] = useDimensions()
+
+  const isMobile = React.useMemo(() => {
+    return containerDimensions && containerDimensions.width < 550
+  }, [containerDimensions])
+
+  return [containerRef, isMobile]
 }

@@ -1,11 +1,17 @@
+// polyfills
+import 'core-js/stable'
+import 'whatwg-fetch'
+
 import React from "react";
 import ReactDOM from "react-dom";
 import deburr from 'lodash/deburr'
 import orderBy from 'lodash/orderBy'
 
-import { computeStats, HeatStrip } from './shared.jsx'
+import { computeStats, HeatStrip, useIsMobile } from './shared.jsx'
 
 const DistrictsTable = () => {
+  const [containerRef, isMobile] = useIsMobile()
+
   const [districts, setDistricts] = React.useState(null)
 
   React.useEffect(() => {
@@ -71,17 +77,18 @@ const DistrictsTable = () => {
     return (showAll || usingSearchQuery) ? districtsAfterSortAndSearch : districtsAfterSortAndSearch.slice(0, 15)
   }, [districtsAfterSortAndSearch, showAll, usingSearchQuery])
 
+  const [showCols, setShowCols] = React.useState('last7DaysCases')
+  const switchCols = React.useCallback(cols => {
+    setShowCols(cols)
+    setSort([cols + 'Per100000', 'desc'])
+  }, [setShowCols, setSort])
+
   if (!districts) {
     return null
   }
 
-  // console.log('------', {
-  //   districts,
-  //   districtsSorted
-  // })
-
   return (
-    <div className="datarozhlas-covid-obce-container">
+    <div className={`datarozhlas-covid-obce-container ${isMobile ? 'datarozhlas-covid-obce-mobile' : ''}`} ref={containerRef}>
       <h3 className="datarozhlas-covid-obce-headline">Detekovaní nakažení po okresech</h3>
 
       <input
@@ -92,55 +99,82 @@ const DistrictsTable = () => {
         placeholder="Hledejte dle názvu okresu či obce…"
       />
 
+      {isMobile && (
+        <div className="datarozhlas-covid-obce-cols-switch">
+          <button
+            className={`datarozhlas-covid-obce-cols-switch-button ${(showCols === 'last7DaysCases') ? 'active' : ''}`}
+            type="button"
+            onClick={() => switchCols('last7DaysCases')}
+          >
+            Posledních 7 dní
+          </button>
+          <button
+            className={`datarozhlas-covid-obce-cols-switch-button ${(showCols === 'totalCases') ? 'active' : ''}`}
+            type="button"
+            onClick={() => switchCols('totalCases')}
+          >
+            Celková čísla
+          </button>
+        </div>
+      )}
+
       <table className="datarozhlas-covid-obce-table">
         <thead>
           <tr>
             <th></th>
             <th></th>
-            <th>
-              <button type="button" onClick={() => toggleSort('totalCases')}>
-                Celkem
-                {sort[0] === 'totalCases' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'totalCases' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
-            <th>
-              <button type="button" onClick={() => toggleSort('totalCasesPer100000')}>
-                Na 100 tisíc
-                {sort[0] === 'totalCasesPer100000' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'totalCasesPer100000' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
-            <th>
-              <button type="button" onClick={() => toggleSort('last7DaysCases')}>
-                Posl. 7&nbsp;dní
-                {sort[0] === 'last7DaysCases' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'last7DaysCases' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
-            <th>
-              <button type="button" onClick={() => toggleSort('last7DaysCasesPer100000')}>
-                Na 100 tisíc
-                {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'asc' && (
-                  <>&nbsp;↑</>
-                )}
-                {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'desc' && (
-                  <>&nbsp;↓</>
-                )}
-              </button>
-            </th>
+            {(!isMobile || showCols === 'totalCases') && (
+              <>
+                <th>
+                  <button type="button" onClick={() => toggleSort('totalCases')}>
+                    Celkem
+                    {sort[0] === 'totalCases' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'totalCases' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+                <th>
+                  <button type="button" onClick={() => toggleSort('totalCasesPer100000')}>
+                    Na&nbsp;100 tisíc
+                    {sort[0] === 'totalCasesPer100000' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'totalCasesPer100000' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+              </>
+            )}
+            {(!isMobile || showCols === 'last7DaysCases') && (
+              <>
+                <th>
+                  <button type="button" onClick={() => toggleSort('last7DaysCases')}>
+                    Posl. 7&nbsp;dní
+                    {sort[0] === 'last7DaysCases' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'last7DaysCases' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+                <th>
+                  <button type="button" onClick={() => toggleSort('last7DaysCasesPer100000')}>
+                    Na&nbsp;100 tisíc
+                    {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'asc' && (
+                      <>&nbsp;↑</>
+                    )}
+                    {sort[0] === 'last7DaysCasesPer100000' && sort[1] === 'desc' && (
+                      <>&nbsp;↓</>
+                    )}
+                  </button>
+                </th>
+              </>
+            )}
             <th className="datarozhlas-covid-obce-hs-legend-cell">
               <div className="datarozhlas-covid-obce-hs-legend-title">
                 DETEKOVANÍ PO TÝDNECH NA 100 TISÍC
@@ -174,10 +208,18 @@ const DistrictsTable = () => {
                     </button>
                   </td>
                   <td><strong>{district.name}</strong></td>
-                  <td className="datarozhlas-covid-obce-num-cell">{district.totalCases}</td>
-                  <td className="datarozhlas-covid-obce-capita-cell">{district.totalCasesPer100000}</td>
-                  <td className="datarozhlas-covid-obce-num-cell">{district.last7DaysCases}</td>
-                  <td className="datarozhlas-covid-obce-capita-cell">{district.last7DaysCasesPer100000}</td>
+                  {(!isMobile || showCols === 'totalCases') && (
+                    <>
+                      <td className="datarozhlas-covid-obce-num-cell">{district.totalCases}</td>
+                      <td className="datarozhlas-covid-obce-capita-cell">{district.totalCasesPer100000}</td>
+                    </>
+                  )}
+                  {(!isMobile || showCols === 'last7DaysCases') && (
+                    <>
+                      <td className="datarozhlas-covid-obce-num-cell">{district.last7DaysCases}</td>
+                      <td className="datarozhlas-covid-obce-capita-cell">{district.last7DaysCasesPer100000}</td>
+                    </>
+                  )}              
                   <td className="datarozhlas-covid-obce-heat-strip-cell">
                     <HeatStrip levelsPerWeek={district.levelsPerWeek} />
                   </td>
@@ -189,10 +231,18 @@ const DistrictsTable = () => {
                       <tr key={`district-${district.name}-municipality-${municipality.name}`}>
                         <td></td>
                         <td>{municipality.name}</td>
-                        <td className="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
-                        <td className="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
-                        <td className="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
-                        <td className="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
+                        {(!isMobile || showCols === 'totalCases') && (
+                          <>
+                            <td className="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
+                            <td className="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
+                          </>
+                        )}
+                        {(!isMobile || showCols === 'last7DaysCases') && (
+                          <>
+                            <td className="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
+                            <td className="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
+                          </>
+                        )}
                         <td className="datarozhlas-covid-obce-heat-strip-cell">
                           <HeatStrip levelsPerWeek={municipality.levelsPerWeek} />
                         </td>
@@ -205,7 +255,7 @@ const DistrictsTable = () => {
           })}
           {!usingSearchQuery && (
             <tr>
-              <td colSpan={7} className="datarozhlas-covid-obce-show-cell">
+              <td colSpan={isMobile ? 5 : 7} className="datarozhlas-covid-obce-show-cell">
                 <button type="button" onClick={() => setShowAll(!showAll)}>
                   {showAll ? 'Zobrazit méně okresů' : 'Zobrazit všechny okresy'}
                 </button>
@@ -214,11 +264,12 @@ const DistrictsTable = () => {
           )}
           {districtsAfterSortAndSearch.length === 0 && (
             <tr>
-              <td colSpan={7}>Obec ani okres s hledaným názvem jsme nenašli</td>
+              <td colSpan={isMobile ? 5 : 7}>Obec ani okres s hledaným názvem jsme nenašli</td>
             </tr>
           )}
         </tbody>
       </table>
+      <div className="datarozhlas-covid-obce-source">Zdroj dat: ÚZIS</div>
     </div>
   )
 }

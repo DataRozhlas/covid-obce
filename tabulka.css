@@ -27,6 +27,16 @@
   margin-top: -28px;
 }
 
+.datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-table {
+  margin-top: 0;
+}
+
+@media screen and (max-width: 350px) {
+  .datarozhlas-covid-obce-table {
+    font-size: 0.875em;
+  }
+}
+
 .datarozhlas-covid-obce-table thead th {
   border-bottom: 1px solid #ABABAB;
   font-family: Arial, sans-serif;
@@ -74,6 +84,10 @@
   border-left: 1px solid rgba(255, 255, 255, .25)
 }
 
+.datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-heat-strip-item {
+  width: 2px;
+}
+
 .datarozhlas-covid-obce-heat-strip-item.heat-strip-level-0 {
   background: #F2F2F2;
 }
@@ -96,6 +110,12 @@
 
 .datarozhlas-covid-obce-heat-strip-cell {
   padding-left: 20px !important;
+}
+
+@media screen and (max-width: 350px) {
+  .datarozhlas-covid-obce-heat-strip-cell {
+    padding-left: 5px !important;
+  }
 }
 
 .datarozhlas-covid-obce-num-cell {
@@ -133,11 +153,19 @@
   max-width: 136px;
 }
 
+.datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-hs-legend-title {
+  max-width: 102px;
+}
+
 .datarozhlas-covid-obce-hs-legend {
   display: flex;
   flex-direction: row;
   max-width: 136px;
   margin-top: 5px;
+}
+
+.datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-hs-legend {
+  max-width: 102px;
 }
 
 .datarozhlas-covid-obce-hs-legend-1 {
@@ -172,8 +200,18 @@
   margin-top: 3px;
 }
 
+.datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-hs-legend-labels {
+  max-width: 102px;
+}
+
 .datarozhlas-covid-obce-hs-legend-cell {
   padding-left: 20px !important;
+}
+
+@media screen and (max-width: 350px) {
+  .datarozhlas-covid-obce-hs-legend-cell {
+    padding-left: 5px !important;
+  }
 }
 
 .datarozhlas-covid-obce-expand-button {
@@ -223,4 +261,42 @@
 .datarozhlas-covid-obce-population-filter-button:disabled {
   color: #7F7F7F;
   cursor: not-allowed;
+}
+
+.datarozhlas-covid-obce-cols-switch {
+  margin-top: 6px;
+}
+
+.datarozhlas-covid-obce-cols-switch-button {
+  background: #F2F2F2;
+  border: 1px solid #D0D0D0;
+  margin: 0;
+  padding: 5px 10px;
+
+  font-family: "Noticia Text", serif;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #7F7F7F;
+
+  cursor: pointer;
+}
+
+.datarozhlas-covid-obce-cols-switch-button:hover,
+.datarozhlas-covid-obce-cols-switch-button:active {
+  border-color: #999999;
+}
+
+.datarozhlas-covid-obce-cols-switch-button.active {
+  background: #FFFFFF;
+  color: #000000;
+}
+
+.datarozhlas-covid-obce-source {
+  text-align: left;
+  font-family: "Noticia Text", serif;
+  font-size: 0.75em;
+  line-height: 1.2;
+  color: #999999;
+  margin-top: 7px;
 }
