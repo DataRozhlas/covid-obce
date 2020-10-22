@@ -6,7 +6,7 @@
   font-family: "Noticia Text", serif;
   font-size: 20px;
   line-height: 1.2;
-  font-weight: 900;
+  font-weight: 700;
   color: #000000;
   margin: 1.25em 0 .5em;
 }
@@ -124,7 +124,7 @@
   font-family: "Noticia Text", serif;
   font-size: 14px;
   line-height: 1.2;
-  font-weight: 900;
+  font-weight: 700;
   color: #000000;
 }
 
@@ -189,4 +189,38 @@
 
 .datarozhlas-covid-obce-expand-button:hover {
   color: #d52834;
+}
+
+.datarozhlas-covid-obce-population-filter {
+  margin-top: 6px;
+}
+
+.datarozhlas-covid-obce-population-filter-button {
+  background: #F2F2F2;
+  border: 1px solid #D0D0D0;
+  margin: 0;
+  padding: 5px 10px;
+
+  font-family: "Noticia Text", serif;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #7F7F7F;
+
+  cursor: pointer;
+}
+
+.datarozhlas-covid-obce-population-filter-button:hover,
+.datarozhlas-covid-obce-population-filter-button:active {
+  border-color: #999999;
+}
+
+.datarozhlas-covid-obce-population-filter-button.active {
+  background: #FFFFFF;
+  color: #000000;
+}
+
+.datarozhlas-covid-obce-population-filter-button:disabled {
+  color: #7F7F7F;
+  cursor: not-allowed;
 }

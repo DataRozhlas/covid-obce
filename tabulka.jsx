@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import deburr from 'lodash/deburr'
 import orderBy from 'lodash/orderBy'
 
-import { computeStats } from './shared.jsx'
+import { computeStats, HeatStrip } from './shared.jsx'
 
 const MunicipalitiesTable = () => {
   const [municipalities, setMunicipalities] = React.useState(null)
@@ -27,6 +27,8 @@ const MunicipalitiesTable = () => {
 
   const [searchQuery, setSearchQuery] = React.useState('')
 
+  const [onlyBigger, setOnlyBigger] = React.useState(true)
+
   const municipalitiesAfterSort = React.useMemo(() => {    
     return orderBy(municipalities, [sort[0]], [sort[1]])
   }, [municipalities, sort])
@@ -35,12 +37,12 @@ const MunicipalitiesTable = () => {
     const searchQueryNormalized = searchQuery.toLowerCase().trim()
 
     if (searchQueryNormalized.length < 2) {
-      return municipalitiesAfterSort
+      return municipalitiesAfterSort.filter(municipality => onlyBigger ? (municipality.population > 1000) : true)
     }
 
     return municipalitiesAfterSort
       .filter(municipality => municipality.searchName.includes(searchQueryNormalized) || municipality.searchNameUnaccented.includes(searchQueryNormalized))
-  }, [municipalitiesAfterSort, searchQuery])
+  }, [municipalitiesAfterSort, searchQuery, onlyBigger])
 
   const usingSearchQuery = searchQuery.toLowerCase().trim().length >= 2
 
@@ -55,18 +57,37 @@ const MunicipalitiesTable = () => {
   }
 
   return (
-    <div class="datarozhlas-covid-obce-container">
-      <h3 class="datarozhlas-covid-obce-headline">Detekovaní nakažení po obcích</h3>
+    <div className="datarozhlas-covid-obce-container">
+      <h3 className="datarozhlas-covid-obce-headline">Detekovaní nakažení po obcích</h3>
 
       <input
-        class="datarozhlas-covid-obce-search"
+        className="datarozhlas-covid-obce-search"
         type="text"
         value={searchQuery}
         onChange={e => setSearchQuery(e.currentTarget.value)}
         placeholder="Hledejte dle názvu obce…"
       />
 
-      <table class="datarozhlas-covid-obce-table">
+      <div className="datarozhlas-covid-obce-population-filter">
+        <button
+          className={`datarozhlas-covid-obce-population-filter-button ${(onlyBigger && !usingSearchQuery) ? 'active' : ''}`}
+          type="button"
+          disabled={usingSearchQuery}
+          onClick={() => setOnlyBigger(true)}
+        >
+          Jen s počtem obyvatel nad 1&thinsp;000
+        </button>
+        <button
+          className={`datarozhlas-covid-obce-population-filter-button ${(!onlyBigger || usingSearchQuery) ? 'active' : ''}`}
+          type="button"
+          disabled={usingSearchQuery}
+          onClick={() => setOnlyBigger(false)}
+        >
+          Všechny obce
+        </button>
+      </div>
+
+      <table className="datarozhlas-covid-obce-table">
         <thead>
           <tr>
             <th>Obce</th>
@@ -114,17 +135,17 @@ const MunicipalitiesTable = () => {
                 )}
               </button>
             </th>
-            <th class="datarozhlas-covid-obce-hs-legend-cell">
-              <div class="datarozhlas-covid-obce-hs-legend-title">
+            <th className="datarozhlas-covid-obce-hs-legend-cell">
+              <div className="datarozhlas-covid-obce-hs-legend-title">
                 DETEKOVANÍ PO TÝDNECH NA 100 TISÍC
               </div>
-              <div class="datarozhlas-covid-obce-hs-legend">
-                <div class="datarozhlas-covid-obce-hs-legend-1" />
-                <div class="datarozhlas-covid-obce-hs-legend-2" />
-                <div class="datarozhlas-covid-obce-hs-legend-3" />
-                <div class="datarozhlas-covid-obce-hs-legend-4" />
+              <div className="datarozhlas-covid-obce-hs-legend">
+                <div className="datarozhlas-covid-obce-hs-legend-1" />
+                <div className="datarozhlas-covid-obce-hs-legend-2" />
+                <div className="datarozhlas-covid-obce-hs-legend-3" />
+                <div className="datarozhlas-covid-obce-hs-legend-4" />
               </div>
-              <div class="datarozhlas-covid-obce-hs-legend-labels">
+              <div className="datarozhlas-covid-obce-hs-legend-labels">
                 <div>MÉNĚ</div>
                 <div>VÍCE</div>
               </div>
@@ -136,11 +157,11 @@ const MunicipalitiesTable = () => {
             return (
               <tr key={`district-${municipality.name}`}>
                 <td>{municipality.name}</td>
-                <td class="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
-                <td class="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
-                <td class="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
-                <td class="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
-                <td class="datarozhlas-covid-obce-heat-strip-cell">
+                <td className="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
+                <td className="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
+                <td className="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
+                <td className="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
+                <td className="datarozhlas-covid-obce-heat-strip-cell">
                   <HeatStrip levelsPerWeek={municipality.levelsPerWeek} />
                 </td>
               </tr>
@@ -148,7 +169,7 @@ const MunicipalitiesTable = () => {
           })}
           {showCount <= municipalitiesAfterSortAndSearchAndShowCount.length && (
             <tr>
-              <td colSpan={6} class="datarozhlas-covid-obce-show-cell">
+              <td colSpan={6} className="datarozhlas-covid-obce-show-cell">
                 <button type="button" onClick={() => setShowCount(showCount + 15)}>
                   Zobrazit více obcí
                 </button>
@@ -162,16 +183,6 @@ const MunicipalitiesTable = () => {
           )}
         </tbody>
       </table>
-    </div>
-  )
-}
-
-const HeatStrip = ({ levelsPerWeek }) => {
-  return (
-    <div class="datarozhlas-covid-obce-heat-strip">
-      {levelsPerWeek.map((level, index) => (
-        <div key={index} class={`datarozhlas-covid-obce-heat-strip-item heat-strip-level-${level}`} />
-      ))}
     </div>
   )
 }

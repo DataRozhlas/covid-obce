@@ -81,18 +81,18 @@ const DistrictsTable = () => {
   // })
 
   return (
-    <div class="datarozhlas-covid-obce-container">
-      <h3 class="datarozhlas-covid-obce-headline">Detekovaní nakažení po okresech</h3>
+    <div className="datarozhlas-covid-obce-container">
+      <h3 className="datarozhlas-covid-obce-headline">Detekovaní nakažení po okresech</h3>
 
       <input
-        class="datarozhlas-covid-obce-search"
+        className="datarozhlas-covid-obce-search"
         type="text"
         value={searchQuery}
         onChange={e => setSearchQuery(e.currentTarget.value)}
         placeholder="Hledejte dle názvu okresu či obce…"
       />
 
-      <table class="datarozhlas-covid-obce-table">
+      <table className="datarozhlas-covid-obce-table">
         <thead>
           <tr>
             <th></th>
@@ -141,17 +141,17 @@ const DistrictsTable = () => {
                 )}
               </button>
             </th>
-            <th class="datarozhlas-covid-obce-hs-legend-cell">
-              <div class="datarozhlas-covid-obce-hs-legend-title">
+            <th className="datarozhlas-covid-obce-hs-legend-cell">
+              <div className="datarozhlas-covid-obce-hs-legend-title">
                 DETEKOVANÍ PO TÝDNECH NA 100 TISÍC
               </div>
-              <div class="datarozhlas-covid-obce-hs-legend">
-                <div class="datarozhlas-covid-obce-hs-legend-1" />
-                <div class="datarozhlas-covid-obce-hs-legend-2" />
-                <div class="datarozhlas-covid-obce-hs-legend-3" />
-                <div class="datarozhlas-covid-obce-hs-legend-4" />
+              <div className="datarozhlas-covid-obce-hs-legend">
+                <div className="datarozhlas-covid-obce-hs-legend-1" />
+                <div className="datarozhlas-covid-obce-hs-legend-2" />
+                <div className="datarozhlas-covid-obce-hs-legend-3" />
+                <div className="datarozhlas-covid-obce-hs-legend-4" />
               </div>
-              <div class="datarozhlas-covid-obce-hs-legend-labels">
+              <div className="datarozhlas-covid-obce-hs-legend-labels">
                 <div>MÉNĚ</div>
                 <div>VÍCE</div>
               </div>
@@ -165,7 +165,7 @@ const DistrictsTable = () => {
                 <tr key={`district-${district.name}`}>
                   <td>
                     <button
-                      class="datarozhlas-covid-obce-expand-button"
+                      className="datarozhlas-covid-obce-expand-button"
                       type="button"
                       onClick={() => toggleDistrict(district.name)}
                       disabled={usingSearchQuery}
@@ -174,11 +174,11 @@ const DistrictsTable = () => {
                     </button>
                   </td>
                   <td><strong>{district.name}</strong></td>
-                  <td class="datarozhlas-covid-obce-num-cell">{district.totalCases}</td>
-                  <td class="datarozhlas-covid-obce-capita-cell">{district.totalCasesPer100000}</td>
-                  <td class="datarozhlas-covid-obce-num-cell">{district.last7DaysCases}</td>
-                  <td class="datarozhlas-covid-obce-capita-cell">{district.last7DaysCasesPer100000}</td>
-                  <td class="datarozhlas-covid-obce-heat-strip-cell">
+                  <td className="datarozhlas-covid-obce-num-cell">{district.totalCases}</td>
+                  <td className="datarozhlas-covid-obce-capita-cell">{district.totalCasesPer100000}</td>
+                  <td className="datarozhlas-covid-obce-num-cell">{district.last7DaysCases}</td>
+                  <td className="datarozhlas-covid-obce-capita-cell">{district.last7DaysCasesPer100000}</td>
+                  <td className="datarozhlas-covid-obce-heat-strip-cell">
                     <HeatStrip levelsPerWeek={district.levelsPerWeek} />
                   </td>
                 </tr>
@@ -189,11 +189,11 @@ const DistrictsTable = () => {
                       <tr key={`district-${district.name}-municipality-${municipality.name}`}>
                         <td></td>
                         <td>{municipality.name}</td>
-                        <td class="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
-                        <td class="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
-                        <td class="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
-                        <td class="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
-                        <td class="datarozhlas-covid-obce-heat-strip-cell">
+                        <td className="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
+                        <td className="datarozhlas-covid-obce-capita-cell">{municipality.totalCasesPer100000}</td>
+                        <td className="datarozhlas-covid-obce-num-cell">{municipality.last7DaysCases}</td>
+                        <td className="datarozhlas-covid-obce-capita-cell">{municipality.last7DaysCasesPer100000}</td>
+                        <td className="datarozhlas-covid-obce-heat-strip-cell">
                           <HeatStrip levelsPerWeek={municipality.levelsPerWeek} />
                         </td>
                       </tr>
@@ -205,7 +205,7 @@ const DistrictsTable = () => {
           })}
           {!usingSearchQuery && (
             <tr>
-              <td colSpan={7} class="datarozhlas-covid-obce-show-cell">
+              <td colSpan={7} className="datarozhlas-covid-obce-show-cell">
                 <button type="button" onClick={() => setShowAll(!showAll)}>
                   {showAll ? 'Zobrazit méně okresů' : 'Zobrazit všechny okresy'}
                 </button>

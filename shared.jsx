@@ -46,9 +46,9 @@ export const computeStats = (municipalityOrDistrict, casesLevelsThresholds) => {
 
 export const HeatStrip = ({ levelsPerWeek }) => {
   return (
-    <div class="datarozhlas-covid-obce-heat-strip">
+    <div className="datarozhlas-covid-obce-heat-strip">
       {levelsPerWeek.map((level, index) => (
-        <div key={index} class={`datarozhlas-covid-obce-heat-strip-item heat-strip-level-${level}`} />
+        <div key={index} className={`datarozhlas-covid-obce-heat-strip-item heat-strip-level-${level}`} />
       ))}
     </div>
   )
