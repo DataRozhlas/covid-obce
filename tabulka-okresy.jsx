@@ -83,7 +83,7 @@ const DistrictsTable = () => {
     setSort([cols + 'Per100000', 'desc'])
   }, [setShowCols, setSort])
 
-  const [heatStripType, setHeatStripType] = React.useState('changes')
+  const [heatStripType, setHeatStripType] = React.useState('abs')
 
   if (!districts) {
     return null
@@ -95,12 +95,12 @@ const DistrictsTable = () => {
     <div className={`datarozhlas-covid-obce-container ${isMobile ? 'datarozhlas-covid-obce-mobile' : ''}`} ref={containerRef}>
       <h3 className="datarozhlas-covid-obce-headline">Pozitivně testovaní po okresech</h3>
 
-      <div>
+      {/* <div>
         <select value={heatStripType} onChange={e => setHeatStripType(e.target.value)}>
           <option value="abs">Per capita v heat stripu</option>
           <option value="changes">Zmeny v heat stripu</option>
         </select>
-      </div>
+      </div> */}
 
       <input
         className="datarozhlas-covid-obce-search"

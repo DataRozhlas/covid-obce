@@ -64,7 +64,7 @@ const MunicipalitiesTable = () => {
     setSort([cols + 'Per100000', 'desc'])
   }, [setShowCols, setSort])
 
-  const [heatStripType, setHeatStripType] = React.useState('changes')
+  const [heatStripType, setHeatStripType] = React.useState('abs')
   
   if (!municipalities) {
     return null
@@ -76,12 +76,12 @@ const MunicipalitiesTable = () => {
     <div className={`datarozhlas-covid-obce-container ${isMobile ? 'datarozhlas-covid-obce-mobile' : ''}`} ref={containerRef}>
       <h3 className="datarozhlas-covid-obce-headline">Pozitivně testovaní po obcích</h3>    
 
-      <div>
+      {/* <div>
         <select value={heatStripType} onChange={e => setHeatStripType(e.target.value)}>
           <option value="abs">Per capita v heat stripu</option>
           <option value="changes">Zmeny v heat stripu</option>
         </select>
-      </div>
+      </div> */}
 
       <input
         className="datarozhlas-covid-obce-search"
@@ -298,8 +298,8 @@ const prepareMunicipalitiesData = (payload) => {
       name: municipalityName,
       nameSuffix,
       uniqueName,
-      searchName: uniqueName.toLowerCase(),
-      searchNameUnaccented: deburr(uniqueName).toLowerCase(),
+      searchName: municipalityName.toLowerCase(),
+      searchNameUnaccented: deburr(municipalityName).toLowerCase(),
       population,
       casesPerWeek,
       last7DaysCases
