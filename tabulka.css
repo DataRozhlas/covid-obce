@@ -79,6 +79,7 @@
 }
 
 .datarozhlas-covid-obce-heat-strip-item {
+  box-sizing: border-box;
   width: 3px;
   height: 17px;
   border-left: 1px solid rgba(255, 255, 255, .25)
@@ -132,6 +133,7 @@
 }
 
 .datarozhlas-covid-obce-show-cell button {
+  box-sizing: border-box;
   display: block;
   width: 100%;
   background: #F2F2F2;
