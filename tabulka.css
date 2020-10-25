@@ -49,6 +49,10 @@
   padding: 9px 5px;
 }
 
+.datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-table thead th {
+  padding: 9px 2px;
+}
+
 .datarozhlas-covid-obce-table thead th button {
   background: none;
   border: none;
@@ -71,6 +75,10 @@
 .datarozhlas-covid-obce-table tbody td {
   border-bottom: 1px solid #D4D4D4;
   padding: 10px 5px;
+}
+
+.datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-table tbody td {
+  padding: 10px 2px;
 }
 
 .datarozhlas-covid-obce-heat-strip {
@@ -115,7 +123,7 @@
 
 @media screen and (max-width: 350px) {
   .datarozhlas-covid-obce-heat-strip-cell {
-    padding-left: 5px !important;
+    padding-left: 10px !important;
   }
 }
 
@@ -212,7 +220,7 @@
 
 @media screen and (max-width: 350px) {
   .datarozhlas-covid-obce-hs-legend-cell {
-    padding-left: 5px !important;
+    padding-left: 10px !important;
   }
 }
 
