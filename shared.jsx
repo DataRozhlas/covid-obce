@@ -93,3 +93,7 @@ export const useIsMobile = () => {
 
   return [containerRef, isMobile]
 }
+
+export const DataSource = () => (
+  <div className="datarozhlas-covid-obce-source">Zdroje dat: <a href="https://www.czso.cz/csu/czso/pocet-obyvatel-v-obcich-k-112019" target="_blank">ČSÚ</a>, <a href="http://services.cuzk.cz/shp/stat/epsg-5514/1.zip" target="_blank">ČÚZK</a>, <a href="https://share.uzis.cz/s/dCZBiARJ27ayeoS" target="_blank">ÚZIS</a></div>
+)

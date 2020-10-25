@@ -24,7 +24,7 @@
 .datarozhlas-covid-obce-table {
   border-collapse: collapse;
   width: 100%;
-  margin-top: -28px;
+  margin: -28px 0 0 0;
 }
 
 .datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-table {
@@ -79,7 +79,7 @@
 }
 
 .datarozhlas-covid-obce-heat-strip-item {
-  box-sizing: border-box;
+  box-sizing: content-box;
   width: 3px;
   height: 17px;
   border-left: 1px solid rgba(255, 255, 255, .25)
@@ -152,22 +152,22 @@
 
 .datarozhlas-covid-obce-hs-legend-title {
   text-align: center;
-  max-width: 136px;
+  width: 136px;
 }
 
 .datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-hs-legend-title {
-  max-width: 102px;
+  width: 102px;
 }
 
 .datarozhlas-covid-obce-hs-legend {
   display: flex;
   flex-direction: row;
-  max-width: 136px;
+  width: 136px;
   margin-top: 5px;
 }
 
 .datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-hs-legend {
-  max-width: 102px;
+  width: 102px;
 }
 
 .datarozhlas-covid-obce-hs-legend-1 {
@@ -198,12 +198,12 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  max-width: 136px;
+  width: 136px;
   margin-top: 3px;
 }
 
 .datarozhlas-covid-obce-mobile .datarozhlas-covid-obce-hs-legend-labels {
-  max-width: 102px;
+  width: 102px;
 }
 
 .datarozhlas-covid-obce-hs-legend-cell {
@@ -295,10 +295,24 @@
 }
 
 .datarozhlas-covid-obce-source {
-  text-align: left;
+  text-align: right;
   font-family: "Noticia Text", serif;
   font-size: 0.75em;
   line-height: 1.2;
   color: #999999;
-  margin-top: 7px;
+  margin: 7px 0 1.5em 0;
+}
+
+.datarozhlas-covid-obce-source a {
+  color: #999999;
+  text-decoration: underline;
+}
+
+.datarozhlas-covid-obce-source a:active,
+.datarozhlas-covid-obce-source a:hover {
+  color: #000000;
+}
+
+.datarozhlas-covid-obce-name-suffix {
+  color: #7A7A7A;
 }

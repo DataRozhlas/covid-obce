@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 import deburr from 'lodash/deburr'
 import orderBy from 'lodash/orderBy'
 
-import { computeStats, HeatStrip, useIsMobile } from './shared.jsx'
+import { computeStats, DataSource, HeatStrip, useIsMobile } from './shared.jsx'
 
 const MunicipalitiesTable = () => {
   const [containerRef, isMobile] = useIsMobile()
@@ -194,8 +194,8 @@ const MunicipalitiesTable = () => {
         <tbody>
           {municipalitiesAfterSortAndSearchAndShowCount.map(municipality => {
             return (
-              <tr key={`district-${municipality.name}`}>
-                <td>{municipality.name}</td>
+              <tr key={`district-${municipality.uniqueName}`}>
+                <td>{municipality.name} <span className="datarozhlas-covid-obce-name-suffix">{municipality.nameSuffix}</span></td>
                 {(!isMobile || showCols === 'totalCases') && (
                   <>
                     <td className="datarozhlas-covid-obce-num-cell">{municipality.totalCases}</td>
@@ -230,7 +230,7 @@ const MunicipalitiesTable = () => {
           )}
         </tbody>
       </table>
-      <div className="datarozhlas-covid-obce-source">Zdroj dat: ÚZIS</div>
+      <DataSource />
     </div>
   )
 }
@@ -241,25 +241,30 @@ const prepareMunicipalitiesData = (payload) => {
   payload.forEach(payloadRow => {      
     const districtName = payloadRow[0]
     const authorityRegionName = payloadRow[1]
-    let municipalityName = payloadRow[2]
+    const municipalityName = payloadRow[2]
     const population = payloadRow[3]
     const last7DaysCases = payloadRow[4]
     const casesPerWeek = payloadRow.slice(5, -1)
 
     // These two are twice in their respective districts and we need to differentiate them
+    let nameSuffix
     if (
       (municipalityName === 'Březina' && districtName === 'Brno-venkov')
       || (municipalityName === 'Mezholezy' && districtName === 'Domažlice')
     ) {
-      municipalityName += ` (${authorityRegionName}, ${districtName})`
+      nameSuffix = `(${authorityRegionName}, ${districtName})`
     } else {
-      municipalityName += ` (${districtName})`
+      nameSuffix = `(${districtName})`
     }
+
+    const uniqueName = `${municipalityName} ${nameSuffix}`
 
     municipalities.push({
       name: municipalityName,
-      searchName: municipalityName.toLowerCase(),
-      searchNameUnaccented: deburr(municipalityName).toLowerCase(),
+      nameSuffix,
+      uniqueName,
+      searchName: uniqueName.toLowerCase(),
+      searchNameUnaccented: deburr(uniqueName).toLowerCase(),
       population,
       casesPerWeek,
       last7DaysCases

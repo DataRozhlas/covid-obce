@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 import deburr from 'lodash/deburr'
 import orderBy from 'lodash/orderBy'
 
-import { computeStats, HeatStrip, useIsMobile } from './shared.jsx'
+import { computeStats, DataSource, HeatStrip, useIsMobile } from './shared.jsx'
 
 const DistrictsTable = () => {
   const [containerRef, isMobile] = useIsMobile()
@@ -269,7 +269,7 @@ const DistrictsTable = () => {
           )}
         </tbody>
       </table>
-      <div className="datarozhlas-covid-obce-source">Zdroj dat: ÚZIS</div>
+      <DataSource />
     </div>
   )
 }
