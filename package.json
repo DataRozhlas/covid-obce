@@ -24,6 +24,7 @@
     "lodash": "^4.17.20",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
+    "react-tippy": "^1.4.0",
     "whatwg-fetch": "^3.4.1"
   }
 }

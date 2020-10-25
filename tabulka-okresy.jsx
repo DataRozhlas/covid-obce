@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 import deburr from 'lodash/deburr'
 import orderBy from 'lodash/orderBy'
 
-import { computeStats, DataSource, HeatStrip, useIsMobile } from './shared.jsx'
+import { computeStats, DataSource, ChangeHeatStrip, HeatStrip, useIsMobile } from './shared.jsx'
 
 const DistrictsTable = () => {
   const [containerRef, isMobile] = useIsMobile()
@@ -83,13 +83,24 @@ const DistrictsTable = () => {
     setSort([cols + 'Per100000', 'desc'])
   }, [setShowCols, setSort])
 
+  const [heatStripType, setHeatStripType] = React.useState('changes')
+
   if (!districts) {
     return null
   }
 
+  const weeksCount = districts[0].casesPerWeek.length
+
   return (
     <div className={`datarozhlas-covid-obce-container ${isMobile ? 'datarozhlas-covid-obce-mobile' : ''}`} ref={containerRef}>
       <h3 className="datarozhlas-covid-obce-headline">Pozitivně testovaní po okresech</h3>
+
+      <div>
+        <select value={heatStripType} onChange={e => setHeatStripType(e.target.value)}>
+          <option value="abs">Per capita v heat stripu</option>
+          <option value="changes">Zmeny v heat stripu</option>
+        </select>
+      </div>
 
       <input
         className="datarozhlas-covid-obce-search"
@@ -175,21 +186,41 @@ const DistrictsTable = () => {
                 </th>
               </>
             )}
-            <th className="datarozhlas-covid-obce-hs-legend-cell">
+            {heatStripType === 'abs' ? (
+              <th className="datarozhlas-covid-obce-hs-legend-cell" style={{ width: isMobile ? 3 * weeksCount : 4 * weeksCount }}>
+                <div className="datarozhlas-covid-obce-hs-legend-title">
+                  POZ.&nbsp;TESTOVANÍ PO TÝDNECH NA 100 TISÍC
+                </div>
+                <div className="datarozhlas-covid-obce-hs-legend">
+                  <div className="datarozhlas-covid-obce-hs-legend-1" />
+                  <div className="datarozhlas-covid-obce-hs-legend-2" />
+                  <div className="datarozhlas-covid-obce-hs-legend-3" />
+                  <div className="datarozhlas-covid-obce-hs-legend-4" />
+                </div>
+                <div className="datarozhlas-covid-obce-hs-legend-labels">
+                  <div>MÉNĚ</div>
+                  <div>VÍCE</div>
+                </div>
+              </th>
+            ): (
+              <th className="datarozhlas-covid-obce-hs-legend-cell" style={{ width: isMobile ? 3 * weeksCount : 4 * weeksCount }}>
               <div className="datarozhlas-covid-obce-hs-legend-title">
-                POZ.&nbsp;TESTOVANÍ PO TÝDNECH NA 100 TISÍC
-              </div>
-              <div className="datarozhlas-covid-obce-hs-legend">
-                <div className="datarozhlas-covid-obce-hs-legend-1" />
-                <div className="datarozhlas-covid-obce-hs-legend-2" />
-                <div className="datarozhlas-covid-obce-hs-legend-3" />
-                <div className="datarozhlas-covid-obce-hs-legend-4" />
-              </div>
-              <div className="datarozhlas-covid-obce-hs-legend-labels">
-                <div>MÉNĚ</div>
-                <div>VÍCE</div>
-              </div>
-            </th>
+                  <br />
+                  ZMĚNY PO TÝDNECH
+                </div>
+                <div className="datarozhlas-covid-obce-hs-legend">
+                  <div className="datarozhlas-covid-obce-hs-legend-ch1" />
+                  <div className="datarozhlas-covid-obce-hs-legend-ch2" />
+                  <div className="datarozhlas-covid-obce-hs-legend-ch3" />
+                  <div className="datarozhlas-covid-obce-hs-legend-ch4" />
+                  <div className="datarozhlas-covid-obce-hs-legend-ch5" />
+                </div>
+                <div className="datarozhlas-covid-obce-hs-legend-labels">
+                  <div>UBYLO</div>
+                  <div>PŘIBYLO</div>
+                </div>
+              </th>
+            )}    
           </tr>
         </thead>
         <tbody>
@@ -221,7 +252,11 @@ const DistrictsTable = () => {
                     </>
                   )}              
                   <td className="datarozhlas-covid-obce-heat-strip-cell">
-                    <HeatStrip levelsPerWeek={district.levelsPerWeek} />
+                    {heatStripType === 'abs' ? (
+                      <HeatStrip municipalityOrDistrict={district} />
+                    ): (
+                      <ChangeHeatStrip municipalityOrDistrict={district} />
+                    )}
                   </td>
                 </tr>
 
@@ -244,7 +279,11 @@ const DistrictsTable = () => {
                           </>
                         )}
                         <td className="datarozhlas-covid-obce-heat-strip-cell">
-                          <HeatStrip levelsPerWeek={municipality.levelsPerWeek} />
+                          {heatStripType === 'abs' ? (
+                            <HeatStrip municipalityOrDistrict={municipality} />
+                          ): (
+                            <ChangeHeatStrip municipalityOrDistrict={municipality} />
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -283,7 +322,9 @@ const prepareDistrictsData = (payload) => {
     let municipalityName = payloadRow[2]
     const population = payloadRow[3]
     const last7DaysCases = payloadRow[4]
-    const casesPerWeek = payloadRow.slice(5, -1)
+    const casesPerWeek = payloadRow.slice(5)
+
+    // casesPerWeek.push(0)
 
     // These two are twice in their respective districts and we need to differentiate them
     if (
