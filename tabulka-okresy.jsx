@@ -204,7 +204,7 @@ const DistrictsTable = () => {
               </th>
             ): (
               <th className="datarozhlas-covid-obce-hs-legend-cell" style={{ width: isMobile ? 3 * weeksCount : 4 * weeksCount }}>
-              <div className="datarozhlas-covid-obce-hs-legend-title">
+                <div className="datarozhlas-covid-obce-hs-legend-title">
                   <br />
                   ZMĚNY PO TÝDNECH
                 </div>
