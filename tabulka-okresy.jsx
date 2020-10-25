@@ -89,7 +89,7 @@ const DistrictsTable = () => {
 
   return (
     <div className={`datarozhlas-covid-obce-container ${isMobile ? 'datarozhlas-covid-obce-mobile' : ''}`} ref={containerRef}>
-      <h3 className="datarozhlas-covid-obce-headline">Detekovaní nakažení po okresech</h3>
+      <h3 className="datarozhlas-covid-obce-headline">Pozitivně testovaní po okresech</h3>
 
       <input
         className="datarozhlas-covid-obce-search"
@@ -177,7 +177,7 @@ const DistrictsTable = () => {
             )}
             <th className="datarozhlas-covid-obce-hs-legend-cell">
               <div className="datarozhlas-covid-obce-hs-legend-title">
-                DETEKOVANÍ PO TÝDNECH NA 100 TISÍC
+                POZ.&nbsp;TESTOVANÍ PO TÝDNECH NA 100 TISÍC
               </div>
               <div className="datarozhlas-covid-obce-hs-legend">
                 <div className="datarozhlas-covid-obce-hs-legend-1" />
